@@ -2,11 +2,8 @@ package lt.viko.eif.blockChain.SingatureAndGui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.File;
 import java.security.PrivateKey;
-import java.text.NumberFormat;
 import java.util.Objects;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -16,11 +13,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
-import javax.swing.text.NumberFormatter;
 
 public class WalletWithUIAndSignatureGeneration {
 
@@ -56,7 +50,7 @@ public class WalletWithUIAndSignatureGeneration {
         fileChooser.showOpenDialog(selectButton);
         pathToKeyTextField.setText(fileChooser.getSelectedFile().getAbsolutePath());
         String keyFileName = pathToKeyTextField.getText();
-        fileType = new RandomFunctions().checkFileType(keyFileName);
+        fileType = new Sing_GetKey_VerifyExtension_RandomFunctions().checkFileType(keyFileName);
         while (!fileType) {
           JOptionPane.showMessageDialog(null,
               "Select valid key file",
@@ -65,7 +59,8 @@ public class WalletWithUIAndSignatureGeneration {
           fileChooser.showOpenDialog(selectButton);
           pathToKeyTextField.setText(fileChooser.getSelectedFile().getAbsolutePath());
           String newKeyFileName = pathToKeyTextField.getText();
-          fileType = new RandomFunctions().checkFileType(newKeyFileName);
+          fileType = new Sing_GetKey_VerifyExtension_RandomFunctions()
+              .checkFileType(newKeyFileName);
         }
         enableCandidateSelection();
 
@@ -86,17 +81,28 @@ public class WalletWithUIAndSignatureGeneration {
     castVoteButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent actionEvent) {
-        //String privateKeyFromFile = new RandomFunctions().readKeyFromFile(pathToKeyTextField.getText());
+        //String privateKeyFromFile = new Sing_GetKey_VerifyExtension_RandomFunctions().readKeyFromFile(pathToKeyTextField.getText());
         try {
+          boolean success;
           String personalNo = personalNoFormattedTextField.getText();
-          String chosenCandidate = Objects.requireNonNull(candidateListComboBox.getSelectedItem()).toString();
-          PrivateKey votersPrivateKey = RandomFunctions.getPrivateKey(pathToKeyTextField.getText());
-          String signature = new RandomFunctions().sign(personalNo + chosenCandidate, votersPrivateKey);
+          String chosenCandidate = Objects.requireNonNull(candidateListComboBox.getSelectedItem())
+              .toString();
+          PrivateKey votersPrivateKey = Sing_GetKey_VerifyExtension_RandomFunctions
+              .getPrivateKey(pathToKeyTextField.getText());
+          String signature = new Sing_GetKey_VerifyExtension_RandomFunctions()
+              .sign(personalNo + chosenCandidate, votersPrivateKey);
 
+          //Sends his choice, ID and signature for verification
+          //need so integrate from this point on
+          success = SignatureVerification.verify(personalNo + ";" + chosenCandidate, signature);
+          if (success) {
+            System.out.println("Voting was fine");
+          } else {
+            System.out.println("You did't vote");
+          }
         } catch (Exception e) {
           e.printStackTrace();
         }
-
       }
     });
 

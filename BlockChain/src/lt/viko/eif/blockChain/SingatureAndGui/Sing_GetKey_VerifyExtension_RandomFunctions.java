@@ -16,7 +16,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import org.apache.commons.io.FilenameUtils;
 
-class RandomFunctions {
+class Sing_GetKey_VerifyExtension_RandomFunctions {
 
   Boolean checkFileType(String keyName) {
     String extension = FilenameUtils.getExtension(keyName);
@@ -29,9 +29,12 @@ class RandomFunctions {
     String userHome = System.getProperty("user.home");
     String newKey = userHome + "/private.der";
     int exitC = 0;
+
+    //Need to find Windows alternative for this
     String[] cmd = {"/bin/sh", "-c",
         "openssl pkcs8 -topk8 -inform PEM -outform DER -in " + privateKeyPath + " -nocrypt > "
             + newKey};
+
     BufferedReader bri = null, bre = null;
     try {
       Process p = Runtime.getRuntime().exec(cmd);
