@@ -1,47 +1,48 @@
 package lt.viko.eif.blockChain;
 
+import java.util.Arrays;
 import java.util.Date;
 
 public class Block {
-  public String hash;
-  public String previousHash;
-  private String data; //Something data...
+  public int hash;
+  public int previousHash;
+  private String vote; //Something data...
   private long timeStamp; //as number of milliseconds since 1/1/1970.
   
   
 
-  public String getHash() {
+  public int getHash() {
 	return hash;
 }
 
 
 
-public void setHash(String hash) {
+public void setHash(int hash) {
 	this.hash = hash;
 }
 
 
 
-public String getPreviousHash() {
+public int getPreviousHash() {
 	return previousHash;
 }
 
 
 
-public void setPreviousHash(String previousHash) {
+public void setPreviousHash(int previousHash) {
 	this.previousHash = previousHash;
 }
 
 
 
 public String getData() {
-	return data;
+	return vote;
 }
 
 
 
 public void setData(String data) {
-	this.data = data;
+	this.vote = data;
 }
 
 
@@ -59,17 +60,22 @@ public void setTimeStamp(long timeStamp) {
 
 
 //Block Constructor.
-  public Block(String data,String previousHash ) {
-    this.data = data;
+  public Block(String data, int previousHash ) {
+    this.vote = data;
     this.previousHash = previousHash;
     this.timeStamp = new Date().getTime();
+    this.hash = Arrays.hashCode(new int[]{data.hashCode(), previousHash});
   }
+
+ 
+
+
 
 
 
 @Override
 public String toString() {
-	return "Block [hash=" + hash + ", previousHash=" + previousHash + ", data=" + data + ", timeStamp=" + timeStamp
+	return "Block [hash=" + hash + ", previousHash=" + previousHash + ", data=" + vote + ", timeStamp=" + timeStamp
 			+ "]";
 }
    
