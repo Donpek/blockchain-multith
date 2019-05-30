@@ -4,6 +4,7 @@ public class Wallet {
     public static void main(String[] args){
         
     	Block genesis = new Block("", 0);
-    	
+    	System.out.print(genesis);
+
     }
 }
