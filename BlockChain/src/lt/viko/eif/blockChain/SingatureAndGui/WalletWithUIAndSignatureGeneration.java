@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
+import java.security.PrivateKey;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -78,6 +79,13 @@ public class WalletWithUIAndSignatureGeneration {
     castVoteButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent actionEvent) {
+        //String privateKeyFromFile = new RandomFunctions().readKeyFromFile(pathToKeyTextField.getText());
+
+        try {
+          PrivateKey votersPrivateKey = RandomFunctions.getPrivateKey(pathToKeyTextField.getText());
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
 
       }
     });
