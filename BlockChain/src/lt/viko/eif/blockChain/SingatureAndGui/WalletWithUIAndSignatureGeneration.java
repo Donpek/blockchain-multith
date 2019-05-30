@@ -6,16 +6,21 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.security.PrivateKey;
+import java.text.NumberFormat;
+import java.util.Objects;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
+import javax.swing.text.NumberFormatter;
 
 public class WalletWithUIAndSignatureGeneration {
 
@@ -29,6 +34,8 @@ public class WalletWithUIAndSignatureGeneration {
   private JButton castVoteButton;
   private JLabel candidateSelectionLabel;
   private JLabel ConfirmationLabel;
+  private JPanel personalNoPanel;
+  private JFormattedTextField personalNoFormattedTextField;
 
   private WalletWithUIAndSignatureGeneration() {
 
@@ -80,9 +87,12 @@ public class WalletWithUIAndSignatureGeneration {
       @Override
       public void actionPerformed(ActionEvent actionEvent) {
         //String privateKeyFromFile = new RandomFunctions().readKeyFromFile(pathToKeyTextField.getText());
-
         try {
+          String personalNo = personalNoFormattedTextField.getText();
+          String chosenCandidate = Objects.requireNonNull(candidateListComboBox.getSelectedItem()).toString();
           PrivateKey votersPrivateKey = RandomFunctions.getPrivateKey(pathToKeyTextField.getText());
+          String signature = new RandomFunctions().sign(personalNo + chosenCandidate, votersPrivateKey);
+
         } catch (Exception e) {
           e.printStackTrace();
         }
@@ -90,8 +100,8 @@ public class WalletWithUIAndSignatureGeneration {
       }
     });
 
-  }
 
+  }
 
   private void disableCandidateSelection() {
     candidateListComboBox.setEnabled(false);

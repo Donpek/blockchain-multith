@@ -3,11 +3,17 @@ package lt.viko.eif.blockChain.SingatureAndGui;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.InvalidKeyException;
 import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Base64;
 import org.apache.commons.io.FilenameUtils;
 
 class RandomFunctions {
@@ -55,12 +61,14 @@ class RandomFunctions {
   }
 
 
-/*  String signChoice(String personalNo, String selectedCandidate, String privateKeyFromFile)
-      throws NoSuchAlgorithmException {
+  String sign(String personalNoAndCandidate, PrivateKey votersPrivateKey)
+      throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
     Signature privateSignature = Signature.getInstance("SHA256withRSA");
-
-    privateSignature.initSign(privateKeyFromFile);
-  }*/
+    privateSignature.initSign(votersPrivateKey);
+    privateSignature.update(personalNoAndCandidate.getBytes(StandardCharsets.UTF_8));
+    byte[] signature = privateSignature.sign();
+    return Base64.getEncoder().encodeToString(signature);
+  }
 
 
 }
