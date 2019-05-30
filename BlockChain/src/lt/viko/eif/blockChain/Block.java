@@ -1,82 +1,92 @@
 package lt.viko.eif.blockChain;
 
-import java.util.Arrays;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 public class Block {
-  public int hash;
-  public int previousHash;
-  private String vote; //Something data...
-  private long timeStamp; //as number of milliseconds since 1/1/1970.
+	
+	private int index;
+	private long timestamp;
+	private String hash;
+	private String previousHash;
+	private String data;
+
+	
+	public Block(int index, long timestamp, String previousHash, String data) {
+		super();
+		this.index = index;
+		this.timestamp = timestamp;
+		this.previousHash = previousHash;
+		this.data = data;
+		hash = Block.calculateHash(this);
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public long getTimestamp() {
+		return timestamp;
+	}
+
+	public String getHash() {
+		return hash;
+	}
+
+	public String getPreviousHash() {
+		return previousHash;
+	}
+
+	public String getData() {
+		return data;
+	}
+	
+	public String str() {
+		return index + timestamp + previousHash + data;
+	}
+	
+	
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Block #").append(index).append(" [previousHash : ").append(previousHash).append(", ").
+		append("timestamp :").append(new Date(timestamp)).append(", ").
+		append("data: ").append(data).append(", ").
+		append("hash: ").append(hash).append("]");
+		
+		return builder.toString();
+	}
+	
+	public static String calculateHash(Block block) {
+		
+		if(block!=null) {
+			MessageDigest digest = null;
+			
+			try {
+				digest = MessageDigest.getInstance("SHA-256");
+			} catch (NoSuchAlgorithmException e) {
+				return null;
+			}
+			
+			String txt = block.str();
+			final byte bytes[] = digest.digest(txt.getBytes());
+			final StringBuilder builder = new StringBuilder();
+			
+			for(final byte b : bytes) {
+				String hex = Integer.toHexString(0xff & b);
+				
+				if(hex.length() == 1)
+				{
+					builder.append('0');
+				}
+				
+				builder.append(hex);
+			}
+			return builder.toString();
+		}
+		return null;
+	}
+
   
-  
-
-  public int getHash() {
-	return hash;
-}
-
-
-
-public void setHash(int hash) {
-	this.hash = hash;
-}
-
-
-
-public int getPreviousHash() {
-	return previousHash;
-}
-
-
-
-public void setPreviousHash(int previousHash) {
-	this.previousHash = previousHash;
-}
-
-
-
-public String getData() {
-	return vote;
-}
-
-
-
-public void setData(String data) {
-	this.vote = data;
-}
-
-
-
-public long getTimeStamp() {
-	return timeStamp;
-}
-
-
-
-public void setTimeStamp(long timeStamp) {
-	this.timeStamp = timeStamp;
-}
-
-
-
-//Block Constructor.
-  public Block(String data, int previousHash ) {
-    this.vote = data;
-    this.previousHash = previousHash;
-    this.timeStamp = new Date().getTime();
-    this.hash = Arrays.hashCode(new int[]{data.hashCode(), previousHash});
-  }
-
- 
-
-
-
-
-
-@Override
-public String toString() {
-	return "Block [hash=" + hash + ", previousHash=" + previousHash + ", data=" + vote + ", timeStamp=" + timeStamp
-			+ "]";
-}
    
 }
