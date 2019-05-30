@@ -10,11 +10,20 @@
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.0</version>
-        <configuration>
+        <configuration>     
           <source>1.8</source>
           <target>1.8</target>
-        </configuration>
+        </configuration> 
       </plugin>
     </plugins>
   </build>
+  <dependencies>
+  
+ <dependency>
+    <groupId>com.google.guava</groupId>
+    <artifactId>guava</artifactId>
+    <version>20.0</version>
+</dependency>
+  
+  </dependencies>
 </project>
