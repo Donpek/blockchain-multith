@@ -39,3 +39,5 @@ SpringMongoHashService\.iml
 mvnw
 
 mvnw.cmd
+
+*.iml
