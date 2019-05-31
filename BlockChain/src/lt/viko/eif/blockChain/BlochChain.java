@@ -26,7 +26,10 @@ public class BlochChain {
 	}
 	
 	public void addBlock(Block b) {
-		blocks.add(b);
+		if(b != null) {
+			blocks.add(b);
+		}
+		
 	}
 	
 	public boolean isFirstBlockValid() {
@@ -67,10 +70,12 @@ public class BlochChain {
 			return true;
 		}
 		
-		return true;
+		return false;
 	}
 	
 	public boolean isBlockChainValid() {
+		
+		
 		if (!isFirstBlockValid()) {
 			return false;
 		}
