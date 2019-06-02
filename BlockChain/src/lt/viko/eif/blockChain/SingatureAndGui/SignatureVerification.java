@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.util.Base64;
+import lt.viko.eif.blockChain.BlochChain;
 
 import static org.apache.commons.lang3.StringUtils.remove;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
@@ -25,6 +26,15 @@ class SignatureVerification {
     //These things can be returned and passed to blockChain if true
     System.out.println("personalNo" + System.lineSeparator() + personalNo);
     System.out.println("chosenCandidate" + System.lineSeparator() + chosenCandidate);
+
+    //Test chain
+    BlochChain blockChain = new BlochChain();
+    if (blockChain.isBlockChainValid()) {
+      blockChain.addBlock(blockChain.newBlock(chosenCandidate));
+    } else {
+      System.out.println("Ou ou");
+    }
+    System.out.println(blockChain);
 
     return publicSignature.verify(signatureBytes);
   }
