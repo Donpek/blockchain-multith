@@ -86,7 +86,19 @@ public class WalletUI {
       public void actionPerformed(ActionEvent actionEvent) {
         //String privateKeyFromFile = new Sing_GetKey_VerifyExtension_RandomFunctions().readKeyFromFile(pathToKeyTextField.getText());
         try {
-          VoterController.GetVoterFromDatabase(personalNoFormattedTextField.getText());
+          String haveIAnyRights = VoterController.GetVoterFromDatabase(personalNoFormattedTextField.getText());
+          assert haveIAnyRights != null;
+          if (haveIAnyRights.equals("true")){
+            System.out.println("do more stuff here");
+            
+          } else {
+            JOptionPane.showMessageDialog(null,
+                "Sorry, you cannot vote (anymore)",
+                "No rights",
+                JOptionPane.WARNING_MESSAGE);
+          }
+
+
         } catch (IOException e) {
           e.printStackTrace();
         }
