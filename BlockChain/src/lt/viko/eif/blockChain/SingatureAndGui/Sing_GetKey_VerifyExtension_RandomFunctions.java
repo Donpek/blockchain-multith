@@ -16,15 +16,15 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import org.apache.commons.io.FilenameUtils;
 
-class Sing_GetKey_VerifyExtension_RandomFunctions {
+public class Sing_GetKey_VerifyExtension_RandomFunctions {
 
-  Boolean checkFileType(String keyName) {
+  public Boolean checkFileType(String keyName) {
     String extension = FilenameUtils.getExtension(keyName);
     return extension.equals("key");
   }
 
 
-  static PrivateKey getPrivateKey(String privateKeyPath)
+  public static PrivateKey getPrivateKey(String privateKeyPath)
       throws Exception {
     String userHome = System.getProperty("user.home");
     String newKey = userHome + "/private.der";
@@ -64,7 +64,7 @@ class Sing_GetKey_VerifyExtension_RandomFunctions {
   }
 
 
-  String sign(String personalNoAndCandidate, PrivateKey votersPrivateKey)
+  public String sign(String personalNoAndCandidate, PrivateKey votersPrivateKey)
       throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
     Signature privateSignature = Signature.getInstance("SHA256withRSA");
     privateSignature.initSign(votersPrivateKey);

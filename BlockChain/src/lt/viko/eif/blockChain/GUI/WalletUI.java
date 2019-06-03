@@ -1,8 +1,9 @@
-package lt.viko.eif.blockChain.SingatureAndGui;
+package lt.viko.eif.blockChain.GUI;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.security.PrivateKey;
 import java.util.Objects;
 import javax.swing.JButton;
@@ -15,8 +16,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import lt.viko.eif.blockChain.SingatureAndGui.SignatureVerification;
+import lt.viko.eif.blockChain.SingatureAndGui.Sing_GetKey_VerifyExtension_RandomFunctions;
+import lt.viko.eif.blockChain.controller.VoterController;
 
-public class WalletWithUIAndSignatureGeneration {
+public class WalletUI {
 
   private JPanel mainPanel;
   private JButton selectButton;
@@ -31,7 +35,7 @@ public class WalletWithUIAndSignatureGeneration {
   private JPanel personalNoPanel;
   private JFormattedTextField personalNoFormattedTextField;
 
-  private WalletWithUIAndSignatureGeneration() {
+  private WalletUI() {
 
     String userHome = System.getProperty("user.home");
     JFileChooser fileChooser = new JFileChooser();
@@ -70,7 +74,6 @@ public class WalletWithUIAndSignatureGeneration {
     candidateListComboBox.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent actionEvent) {
-
         String selectedCandidate = (String) candidateListComboBox.getSelectedItem();
         enableVoting();
         ConfirmationLabel.setText("Vote for " + selectedCandidate + "?");
@@ -82,6 +85,14 @@ public class WalletWithUIAndSignatureGeneration {
       @Override
       public void actionPerformed(ActionEvent actionEvent) {
         //String privateKeyFromFile = new Sing_GetKey_VerifyExtension_RandomFunctions().readKeyFromFile(pathToKeyTextField.getText());
+        try {
+          VoterController.GetVoterFromDatabase(personalNoFormattedTextField.getText());
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+
+
+
         try {
           boolean success;
           String personalNo = personalNoFormattedTextField.getText();
@@ -130,7 +141,7 @@ public class WalletWithUIAndSignatureGeneration {
   public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> {
       JFrame frame = new JFrame("WalletUI");
-      frame.setContentPane(new WalletWithUIAndSignatureGeneration().mainPanel);
+      frame.setContentPane(new WalletUI().mainPanel);
       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       frame.pack();
       frame.setVisible(true);

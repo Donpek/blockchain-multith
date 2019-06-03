@@ -11,9 +11,9 @@ import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 
-class SignatureVerification {
+public class SignatureVerification {
 
-  static boolean verify(String personalNoWithChoice, String signature) throws Exception {
+  public static boolean verify(String personalNoWithChoice, String signature) throws Exception {
     String personalNo = substringBefore(personalNoWithChoice, ";");
     String chosenCandidate = substringAfter(personalNoWithChoice, ";");
     PublicKey votersKey = new SomethingLikeKeyChainAlternative().publicKeyReader(personalNo);
