@@ -16,8 +16,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import lt.viko.eif.blockChain.SingatureAndGui.SignatureVerification;
-import lt.viko.eif.blockChain.SingatureAndGui.Sing_GetKey_VerifyExtension_RandomFunctions;
+import lt.viko.eif.blockChain.KeyOperations.ExtensionChecker;
+import lt.viko.eif.blockChain.KeyOperations.MessageSigner;
+import lt.viko.eif.blockChain.KeyOperations.PemToDerKeyConverter;
+import lt.viko.eif.blockChain.KeyOperations.SignatureVerification;
 import lt.viko.eif.blockChain.controller.VoterController;
 import lt.viko.eif.blockChain.domain.Voter;
 
@@ -55,7 +57,7 @@ public class WalletUI {
         fileChooser.showOpenDialog(selectButton);
         pathToKeyTextField.setText(fileChooser.getSelectedFile().getAbsolutePath());
         String keyFileName = pathToKeyTextField.getText();
-        fileType = new Sing_GetKey_VerifyExtension_RandomFunctions().checkFileType(keyFileName);
+        fileType = new ExtensionChecker().checkFileType(keyFileName);
         while (!fileType) {
           JOptionPane.showMessageDialog(null,
               "Select valid key file",
@@ -64,7 +66,7 @@ public class WalletUI {
           fileChooser.showOpenDialog(selectButton);
           pathToKeyTextField.setText(fileChooser.getSelectedFile().getAbsolutePath());
           String newKeyFileName = pathToKeyTextField.getText();
-          fileType = new Sing_GetKey_VerifyExtension_RandomFunctions()
+          fileType = new ExtensionChecker()
               .checkFileType(newKeyFileName);
         }
         enableCandidateSelection();
@@ -85,72 +87,51 @@ public class WalletUI {
     castVoteButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent actionEvent) {
-        //String privateKeyFromFile = new Sing_GetKey_VerifyExtension_RandomFunctions().readKeyFromFile(pathToKeyTextField.getText());
+        //String privateKeyFromFile = new MessageSigner().readKeyFromFile(pathToKeyTextField.getText());
         try {
-          Voter currentVoter = VoterController.GetVoterFromDatabase(personalNoFormattedTextField.getText());
+          Voter currentVoter = VoterController
+              .GetVoterFromDatabase(personalNoFormattedTextField.getText());
           assert currentVoter != null;
-          if (!currentVoter.getPersonalNo().equals(personalNoFormattedTextField.getText())){
+          if (!currentVoter.getPersonalNo().equals(personalNoFormattedTextField.getText())) {
             JOptionPane.showMessageDialog(null,
                 "There is no voter in registry with such personal no.",
                 "You can't vote",
                 JOptionPane.WARNING_MESSAGE);
           } else {
-            System.out.println("Personal No: "+ currentVoter.getPersonalNo());
+            System.out.println("Personal No: " + currentVoter.getPersonalNo());
             System.out.println("Public key: " + currentVoter.getPublicKey());
             System.out.println("Right to vote: " + currentVoter.getRightToVote());
 
+            try {
+              boolean success;
+              String personalNo = personalNoFormattedTextField.getText();
+              String chosenCandidate = Objects
+                  .requireNonNull(candidateListComboBox.getSelectedItem())
+                  .toString();
+              PrivateKey votersPrivateKey = PemToDerKeyConverter
+                  .getPrivateKey(pathToKeyTextField.getText());
+              String signature = new MessageSigner()
+                  .sign(personalNo + chosenCandidate, votersPrivateKey);
 
-
-
-
-
+              //Sends his choice, ID and signature for verification
+              //need so integrate from this point on
+              success = SignatureVerification.verify(personalNo + ";" + chosenCandidate, signature);
+              if (success) {
+                System.out.println("Voting was fine");
+              } else {
+                System.out.println("You did't vote");
+              }
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
 
 
           }
-
-
-          //String haveIAnyRights = VoterController.GetVoterRightsFromDatabase(personalNoFormattedTextField.getText());
-/*
-          assert haveIAnyRights != null;
-          if (haveIAnyRights.equals("true")){
-            System.out.println("do more stuff here");
-
-          } else {
-            JOptionPane.showMessageDialog(null,
-                "Sorry, you cannot vote (anymore)",
-                "No rights",
-                JOptionPane.WARNING_MESSAGE);
-          }
-*/
-
-
         } catch (IOException e) {
           e.printStackTrace();
         }
 
 
-
-        try {
-          boolean success;
-          String personalNo = personalNoFormattedTextField.getText();
-          String chosenCandidate = Objects.requireNonNull(candidateListComboBox.getSelectedItem())
-              .toString();
-          PrivateKey votersPrivateKey = Sing_GetKey_VerifyExtension_RandomFunctions
-              .getPrivateKey(pathToKeyTextField.getText());
-          String signature = new Sing_GetKey_VerifyExtension_RandomFunctions()
-              .sign(personalNo + chosenCandidate, votersPrivateKey);
-
-          //Sends his choice, ID and signature for verification
-          //need so integrate from this point on
-          success = SignatureVerification.verify(personalNo + ";" + chosenCandidate, signature);
-          if (success) {
-            System.out.println("Voting was fine");
-          } else {
-            System.out.println("You did't vote");
-          }
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
       }
     });
 

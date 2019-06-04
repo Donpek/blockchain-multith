@@ -1,4 +1,4 @@
-package lt.viko.eif.blockChain.SingatureAndGui;
+package lt.viko.eif.blockChain.KeyOperations;
 
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
