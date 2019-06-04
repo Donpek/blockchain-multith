@@ -9,6 +9,10 @@ public class Voter {
   public Voter() {
   }
 
+  public Voter (String personalNo){
+    this.personalNo = personalNo;
+  }
+
   public Voter(String personalNo, String publicKey, String rightToVote) {
     this.personalNo = personalNo;
     this.publicKey = publicKey;

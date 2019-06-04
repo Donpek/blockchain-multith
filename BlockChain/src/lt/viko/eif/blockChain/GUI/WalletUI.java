@@ -19,6 +19,7 @@ import javax.swing.SwingUtilities;
 import lt.viko.eif.blockChain.SingatureAndGui.SignatureVerification;
 import lt.viko.eif.blockChain.SingatureAndGui.Sing_GetKey_VerifyExtension_RandomFunctions;
 import lt.viko.eif.blockChain.controller.VoterController;
+import lt.viko.eif.blockChain.domain.Voter;
 
 public class WalletUI {
 
@@ -86,17 +87,41 @@ public class WalletUI {
       public void actionPerformed(ActionEvent actionEvent) {
         //String privateKeyFromFile = new Sing_GetKey_VerifyExtension_RandomFunctions().readKeyFromFile(pathToKeyTextField.getText());
         try {
-          String haveIAnyRights = VoterController.GetVoterFromDatabase(personalNoFormattedTextField.getText());
+          Voter currentVoter = VoterController.GetVoterFromDatabase(personalNoFormattedTextField.getText());
+          assert currentVoter != null;
+          if (!currentVoter.getPersonalNo().equals(personalNoFormattedTextField.getText())){
+            JOptionPane.showMessageDialog(null,
+                "There is no voter in registry with such personal no.",
+                "You can't vote",
+                JOptionPane.WARNING_MESSAGE);
+          } else {
+            System.out.println("Personal No: "+ currentVoter.getPersonalNo());
+            System.out.println("Public key: " + currentVoter.getPublicKey());
+            System.out.println("Right to vote: " + currentVoter.getRightToVote());
+
+
+
+
+
+
+
+
+          }
+
+
+          //String haveIAnyRights = VoterController.GetVoterRightsFromDatabase(personalNoFormattedTextField.getText());
+/*
           assert haveIAnyRights != null;
           if (haveIAnyRights.equals("true")){
             System.out.println("do more stuff here");
-            
+
           } else {
             JOptionPane.showMessageDialog(null,
                 "Sorry, you cannot vote (anymore)",
                 "No rights",
                 JOptionPane.WARNING_MESSAGE);
           }
+*/
 
 
         } catch (IOException e) {
