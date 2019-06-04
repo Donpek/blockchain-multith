@@ -110,56 +110,68 @@ public class WalletUI {
             disableCandidateSelection();
             disableVoting();
           } else {
-            try {
-              boolean success;
-              String personalNo = personalNoFormattedTextField.getText();
-              String chosenCandidate = Objects
-                  .requireNonNull(candidateListComboBox.getSelectedItem())
-                  .toString();
-              PrivateKey votersPrivateKey = PemToDerKeyConverter
-                  .getPrivateKey(pathToKeyTextField.getText());
-              String signature = new MessageSigner()
-                  .sign(personalNo + chosenCandidate, votersPrivateKey);
-              String uglyPublicKey = currentVoter.getPublicKey();
-              String publicKeyOnPc = new JsonToKeyFileGenerator()
-                  .savePublicKeyToFile(uglyPublicKey);
-              PublicKey votersPublicKey = PemToDerKeyConverter.getPublicKey(publicKeyOnPc);
-              success = SignatureVerification
-                  .verify(personalNo + ";" + chosenCandidate, signature, votersPublicKey);
-              if (success) {
+            if (currentVoter.getRightToVote().equals("false")) {
+              JOptionPane.showMessageDialog(null,
+                  "Sorry, you already voted.",
+                  "You can't vote",
+                  JOptionPane.WARNING_MESSAGE);
+            } else {
 
-                //>>>>>>>>>Integrate blockChain here<<<<<<<<//
-                BlochChain blockChain = new BlochChain();
-                if (blockChain.isBlockChainValid()) {
-                  blockChain.addBlock(blockChain.newBlock(chosenCandidate));
-                  //>>>>>>>>>If good - no more votes for him<<<<<<<<//
-                  disableCandidateSelection();
-                  disableVoting();
-                  VoterController.AlreadyVotedSoRemoveRight(personalNo);
-                  JOptionPane.showMessageDialog(null,
-                      "Vote counted. You won't be able to vote again",
-                      "Vote Successful",
-                      JOptionPane.INFORMATION_MESSAGE);
-                  disableVoting();
-                  disableCandidateSelection();
+              try {
+                boolean success;
+                String personalNo = personalNoFormattedTextField.getText();
+                String chosenCandidate = Objects
+                    .requireNonNull(candidateListComboBox.getSelectedItem())
+                    .toString();
+                PrivateKey votersPrivateKey = PemToDerKeyConverter
+                    .getPrivateKey(pathToKeyTextField.getText());
+                String signature = new MessageSigner()
+                    .sign(personalNo + chosenCandidate, votersPrivateKey);
+                String uglyPublicKey = currentVoter.getPublicKey();
+                String publicKeyOnPc = new JsonToKeyFileGenerator()
+                    .savePublicKeyToFile(uglyPublicKey);
+                PublicKey votersPublicKey = PemToDerKeyConverter.getPublicKey(publicKeyOnPc);
+                success = SignatureVerification
+                    .verify(personalNo + ";" + chosenCandidate, signature, votersPublicKey);
+                if (success) {
+
+
+                  //>>>>>>>>>Integrate blockChain here<<<<<<<<//
+                  BlochChain blockChain = new BlochChain();
+                  if (blockChain.isBlockChainValid()) {
+                    blockChain.addBlock(blockChain.newBlock(chosenCandidate));
+                    //>>>>>>>>>If good - no more votes for him<<<<<<<<//
+                    disableCandidateSelection();
+                    disableVoting();
+                    VoterController.AlreadyVotedSoRemoveRight(personalNo);
+                    JOptionPane.showMessageDialog(null,
+                        "Vote counted.",
+                        "Vote Successful",
+                        JOptionPane.INFORMATION_MESSAGE);
+                    disableVoting();
+                    disableCandidateSelection();
+                  } else {
+                    System.out.println("BlockChain broke or something");
+                  }
+                  System.out.println(blockChain);
+                  //>>>>>>>>>End blockChain stuff<<<<<<<<//
+
+
                 } else {
-                  System.out.println("BlockChain broke or something");
+                  JOptionPane.showMessageDialog(null,
+                      "Tried to vote with someones private key? Shame on you!",
+                      "Bad key imported",
+                      JOptionPane.WARNING_MESSAGE);
+                  disableCandidateSelection();
+                  disableVoting();
                 }
-                System.out.println(blockChain);
-                //>>>>>>>>>End blockchain stuff<<<<<<<<//
-
-
-              } else {
-                JOptionPane.showMessageDialog(null,
-                    "Tried to vote with someones private key? Shame on you!",
-                    "Bad key imported",
-                    JOptionPane.WARNING_MESSAGE);
-                disableCandidateSelection();
-                disableVoting();
+              } catch (Exception e) {
+                e.printStackTrace();
               }
-            } catch (Exception e) {
-              e.printStackTrace();
+
+
             }
+
           }
         } catch (IOException e) {
           e.printStackTrace();
