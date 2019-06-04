@@ -13,17 +13,16 @@ import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 public class SignatureVerification {
 
-  public static boolean verify(String personalNoWithChoice, String signature) throws Exception {
+  public static boolean verify(String personalNoWithChoice, String signature, PublicKey votersKey) throws Exception {
     String personalNo = substringBefore(personalNoWithChoice, ";");
     String chosenCandidate = substringAfter(personalNoWithChoice, ";");
-    PublicKey votersKey = new SomethingLikeKeyChainAlternative().publicKeyReader(personalNo);
     Signature publicSignature = Signature.getInstance("SHA256withRSA");
     publicSignature.initVerify(votersKey);
     String message = remove(personalNoWithChoice, ";");
     publicSignature.update(message.getBytes(StandardCharsets.UTF_8));
     byte[] signatureBytes = Base64.getDecoder().decode(signature);
 
-    //These things can be returned and passed to blockChain if true
+ /*   //These things can be returned and passed to blockChain if true
     System.out.println("personalNo" + System.lineSeparator() + personalNo);
     System.out.println("chosenCandidate" + System.lineSeparator() + chosenCandidate);
 
@@ -35,7 +34,7 @@ public class SignatureVerification {
       System.out.println("Ou ou");
     }
     System.out.println(blockChain);
-
+*/
     return publicSignature.verify(signatureBytes);
   }
 

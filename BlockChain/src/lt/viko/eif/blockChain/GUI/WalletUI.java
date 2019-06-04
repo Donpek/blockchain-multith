@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Objects;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -17,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import lt.viko.eif.blockChain.KeyOperations.ExtensionChecker;
+import lt.viko.eif.blockChain.KeyOperations.JsonToKeyFileGenerator;
 import lt.viko.eif.blockChain.KeyOperations.MessageSigner;
 import lt.viko.eif.blockChain.KeyOperations.PemToDerKeyConverter;
 import lt.viko.eif.blockChain.KeyOperations.SignatureVerification;
@@ -97,6 +99,8 @@ public class WalletUI {
                 "There is no voter in registry with such personal no.",
                 "You can't vote",
                 JOptionPane.WARNING_MESSAGE);
+            disableCandidateSelection();
+            disableVoting();
           } else {
             System.out.println("Personal No: " + currentVoter.getPersonalNo());
             System.out.println("Public key: " + currentVoter.getPublicKey());
@@ -112,14 +116,21 @@ public class WalletUI {
                   .getPrivateKey(pathToKeyTextField.getText());
               String signature = new MessageSigner()
                   .sign(personalNo + chosenCandidate, votersPrivateKey);
-
-              //Sends his choice, ID and signature for verification
-              //need so integrate from this point on
-              success = SignatureVerification.verify(personalNo + ";" + chosenCandidate, signature);
+              String uglyPublicKey = currentVoter.getPublicKey();
+              String publicKeyOnPc = new JsonToKeyFileGenerator()
+                  .savePublicKeyToFile(uglyPublicKey);
+              PublicKey votersPublicKey = PemToDerKeyConverter.getPublicKey(publicKeyOnPc);
+              success = SignatureVerification
+                  .verify(personalNo + ";" + chosenCandidate, signature, votersPublicKey);
               if (success) {
-                System.out.println("Voting was fine");
+                System.out.println("Key matched, continue");
+
+                
+
+
               } else {
-                System.out.println("You did't vote");
+                System.out.println("Signature verification failed");
+                System.out.println("You tried to vote using someones private key, shame on you.");
               }
             } catch (Exception e) {
               e.printStackTrace();
