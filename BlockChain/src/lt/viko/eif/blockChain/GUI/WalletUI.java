@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import lt.viko.eif.blockChain.BlochChain;
 import lt.viko.eif.blockChain.KeyOperations.ExtensionChecker;
 import lt.viko.eif.blockChain.KeyOperations.JsonToKeyFileGenerator;
 import lt.viko.eif.blockChain.KeyOperations.MessageSigner;
@@ -24,6 +25,17 @@ import lt.viko.eif.blockChain.KeyOperations.PemToDerKeyConverter;
 import lt.viko.eif.blockChain.KeyOperations.SignatureVerification;
 import lt.viko.eif.blockChain.controller.VoterController;
 import lt.viko.eif.blockChain.domain.Voter;
+
+/*
+        Citizens able to vote
+
+      49101134312 JolitaBrans
+      36702127422 JonasKlevas
+      38905258472 JuozasParnauskas
+      37112027462 KazimierasButkus
+      49406138372 OnaGenys
+      39209128472 TadasAdomaitis
+*/
 
 public class WalletUI {
 
@@ -51,7 +63,6 @@ public class WalletUI {
     selectButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent actionEvent) {
-
         Boolean fileType;
         disableCandidateSelection();
         disableVoting();
@@ -72,7 +83,6 @@ public class WalletUI {
               .checkFileType(newKeyFileName);
         }
         enableCandidateSelection();
-
       }
     });
 
@@ -82,14 +92,12 @@ public class WalletUI {
         String selectedCandidate = (String) candidateListComboBox.getSelectedItem();
         enableVoting();
         ConfirmationLabel.setText("Vote for " + selectedCandidate + "?");
-
       }
     });
 
     castVoteButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent actionEvent) {
-        //String privateKeyFromFile = new MessageSigner().readKeyFromFile(pathToKeyTextField.getText());
         try {
           Voter currentVoter = VoterController
               .GetVoterFromDatabase(personalNoFormattedTextField.getText());
@@ -102,10 +110,6 @@ public class WalletUI {
             disableCandidateSelection();
             disableVoting();
           } else {
-            System.out.println("Personal No: " + currentVoter.getPersonalNo());
-            System.out.println("Public key: " + currentVoter.getPublicKey());
-            System.out.println("Right to vote: " + currentVoter.getRightToVote());
-
             try {
               boolean success;
               String personalNo = personalNoFormattedTextField.getText();
@@ -123,30 +127,39 @@ public class WalletUI {
               success = SignatureVerification
                   .verify(personalNo + ";" + chosenCandidate, signature, votersPublicKey);
               if (success) {
-                System.out.println("Key matched, continue");
 
-                
+                //>>>>>>>>>Integrate blockChain here<<<<<<<<//
+                BlochChain blockChain = new BlochChain();
+                if (blockChain.isBlockChainValid()) {
+                  blockChain.addBlock(blockChain.newBlock(chosenCandidate));
+                  //>>>>>>>>>If good - no more votes for him<<<<<<<<//
+                  disableCandidateSelection();
+                  disableVoting();
+                  VoterController.AlreadyVotedSoRemoveRight(personalNo);
+                } else {
+                  System.out.println("BlockChain broke or something");
+                }
+                System.out.println(blockChain);
+                //>>>>>>>>>End blockchain stuff<<<<<<<<//
 
 
               } else {
-                System.out.println("Signature verification failed");
-                System.out.println("You tried to vote using someones private key, shame on you.");
+                JOptionPane.showMessageDialog(null,
+                    "Tried to vote with someones private key? Shame on you!",
+                    "Bad key imported",
+                    JOptionPane.WARNING_MESSAGE);
+                disableCandidateSelection();
+                disableVoting();
               }
             } catch (Exception e) {
               e.printStackTrace();
             }
-
-
           }
         } catch (IOException e) {
           e.printStackTrace();
         }
-
-
       }
     });
-
-
   }
 
   private void disableCandidateSelection() {
