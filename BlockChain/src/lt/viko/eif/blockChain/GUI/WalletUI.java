@@ -136,6 +136,12 @@ public class WalletUI {
                   disableCandidateSelection();
                   disableVoting();
                   VoterController.AlreadyVotedSoRemoveRight(personalNo);
+                  JOptionPane.showMessageDialog(null,
+                      "Vote counted. You won't be able to vote again",
+                      "Vote Successful",
+                      JOptionPane.INFORMATION_MESSAGE);
+                  disableVoting();
+                  disableCandidateSelection();
                 } else {
                   System.out.println("BlockChain broke or something");
                 }

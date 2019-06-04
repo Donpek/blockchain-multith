@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import lt.viko.eif.blockChain.domain.Voter;
 
@@ -40,38 +42,23 @@ public class VoterController {
   }
 
 
-  public static void AlreadyVotedSoRemoveRight(String personalNo) throws IOException {
-    /*final String POST_PARAMS = "{\n" + "\"userId\": 101,\r\n" +
-        "    \"id\": 101,\r\n" +
-        "    \"title\": \"Test Title\",\r\n" +
-        "    \"body\": \"Test Body\"" + "\n}";
-    */
-    //System.out.println(POST_PARAMS);
-    URL obj = new URL(
-        "http://54.242.234.218:8080/dbchecker/voters/removeVoterRights/" + personalNo);
-    HttpURLConnection postConnection = (HttpURLConnection) obj.openConnection();
-    postConnection.setRequestMethod("POST");
-    //postConnection.setRequestProperty("userId", "a1bcdefgh");
-    //postConnection.setRequestProperty("Content-Type", "application/json");
-    postConnection.setDoOutput(true);
-    OutputStream os = postConnection.getOutputStream();
-    //os.write(POST_PARAMS.getBytes());
-    os.flush();
-    os.close();
-    int responseCode = postConnection.getResponseCode();
-    //System.out.println("POST Response Code :  " + responseCode);
-    //System.out.println("POST Response Message : " + postConnection.getResponseMessage());
-    if (responseCode == HttpURLConnection.HTTP_CREATED) { //success
-      BufferedReader in = new BufferedReader(new InputStreamReader(
-          postConnection.getInputStream()));
-      String inputLine;
-      StringBuffer response = new StringBuffer();
-      while ((inputLine = in.readLine()) != null) {
-        response.append(inputLine);
+  public static void AlreadyVotedSoRemoveRight(String personalNo)
+      throws IOException {
+    URL urlForPostRequest = new URL(
+        "http://54.242.234.218:8080/dbchecker/voters/removeVotersRights/" + personalNo);
+    System.out.println(urlForPostRequest);
+    String readLine = null;
+    HttpURLConnection connection = (HttpURLConnection) urlForPostRequest.openConnection();
+    connection.setRequestMethod("POST");
+    int responseCode = connection.getResponseCode();
+    if (responseCode == HttpURLConnection.HTTP_CREATED) {
+      BufferedReader in = new BufferedReader(
+          new InputStreamReader(connection.getInputStream()));
+      StringBuilder response = new StringBuilder();
+      while ((readLine = in.readLine()) != null) {
+        response.append(readLine);
       }
       in.close();
-      // print result
-      System.out.println(response.toString());
     } else {
       System.out.println("POST NOT WORKED");
     }
