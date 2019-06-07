@@ -6,6 +6,7 @@ import java.util.Scanner;
 
 import static lt.viko.eif.blockChain.ConsoleInterface.*;
 
+/*
 public class Wallet {
     private static int getNumber(Scanner scan){
         String input = scan.nextLine();
@@ -124,8 +125,10 @@ public class Wallet {
                     // TODO if verification successful, add block to synchronization queue
                     if (voteIsValid) {
                         // addVoteToSynchQueue(vote);
-                        /* TODO verify that the first block in the synch queue is the same block for all nodes
-                            then add it to all of their blockchains */
+                        */
+/* TODO verify that the first block in the synch queue is the same block for all nodes
+                            then add it to all of their blockchains *//*
+
                         // TODO (in voter database) mark that the voter has voted
                         choice = 0;
                         while (choice != CHOICE_OK) {
@@ -184,3 +187,4 @@ public class Wallet {
         choiceStart(scan, choice, input);
     }
 }
+*/

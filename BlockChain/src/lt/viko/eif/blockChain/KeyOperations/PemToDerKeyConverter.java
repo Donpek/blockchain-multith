@@ -20,7 +20,7 @@ public class PemToDerKeyConverter {
     String newKey = userHome + "/private.der";
     int exitC = 0;
     //Need to find Windows alternative for this
-    String[] cmd = {"/bin/sh", "-c",
+    String[] cmd = {"cmd.exe", "/c",
         "openssl pkcs8 -topk8 -inform PEM -outform DER -in " + privateKeyPath + " -nocrypt > "
             + newKey};
     ShellScripting(newKey, exitC, cmd);
@@ -40,7 +40,7 @@ public class PemToDerKeyConverter {
     String newKey = userHome + "/temp_public.der";
     int exitC = 0;
     //Need to find Windows alternative for this
-    String[] cmd = {"/bin/sh", "-c",
+    String[] cmd = {"cmd.exe", "/c",
         "openssl rsa -pubin -inform PEM -in " + publicKeyPath + " -outform DER -out "
             + newKey};
     ShellScripting(newKey, exitC, cmd);
