@@ -264,4 +264,31 @@ public class Counter {
         return percentage;
     }
 
+    public String votesToString() {
+        return "Votes{" + "\n" +
+                "Ingrida Šimonytė=" + IngridaŠimonytė + "votes \n" +
+                ", Gitanas Nausėda=" + GitanasNausėda + "votes \n" +
+                ", Saulius Skvernelis=" + SauliusSkvernelis + "votes \n" +
+                ", Vytenis Povilas Andriukaitis=" + VytenisPovilasAndriukaitis + "votes \n" +
+                ", Arvydas Juozaitis=" + ArvydasJuozaitis + "votes \n" +
+                ", Valdemaras Tomaševskis=" + ValdemarasTomaševskis + "votes \n" +
+                ", Mindaugas Puidokas=" + MindaugasPuidokas + "votes \n" +
+                ", Naglis Puteikis=" + NaglisPuteikis + "votes \n" +
+                ", Valentinas Mazuronis=" + ValentinasMazuronis + "votes \n" +
+                '}';
+    }
+
+    public String percenttoString() {
+        return "Percentages{" + "\n" +
+                "Ingrida Šimonytė=" + IngridaPercent + "% \n" +
+                ", Gitanas Nausėda=" + GitanasPercent + "% \n" +
+                ", Saulius Skvernelis=" + SauliusPercent + "% \n" +
+                ", Vytenis Povilas Andriukaitis=" + VytenisPovilasPercent + "% \n" +
+                ", Arvydas Juozaitis=" + ArvydasPercent + "% \n" +
+                ", Valdemaras Tomaševskis=" + ValdemarasPercent + "% \n" +
+                ", Mindaugas Puidokas=" + MindaugasPercent + "% \n" +
+                ", Naglis Puteikis=" + NaglisPercent + "% \n" +
+                ", Valentinas Mazuronis=" + ValentinasPercent + "% \n" +
+                '}';
+    }
 }
