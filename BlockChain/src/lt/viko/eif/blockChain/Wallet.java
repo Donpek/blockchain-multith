@@ -1,10 +1,8 @@
 package lt.viko.eif.blockChain;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import lt.viko.eif.blockChain.BlockChain.BlochChain;
 
-import static lt.viko.eif.blockChain.ConsoleInterface.*;
+import static org.junit.Assert.assertEquals;
 
 /*
 public class Wallet {
@@ -188,3 +186,18 @@ public class Wallet {
     }
 }
 */
+
+public class Wallet {
+
+    public static void main(String[] args){
+        Counter counter = new Counter();
+        BlochChain blockchain = new BlochChain();
+        blockchain.addBlock(blockchain.newBlock("Ingrida Šimonytė"));
+        blockchain.addBlock(blockchain.newBlock("Vytenis Povilas Andriukaitis"));
+        blockchain.addBlock(blockchain.newBlock("Vytenis Povilas Andriukaitis"));
+        System.out.println(blockchain);
+        int a = counter.getVotes(blockchain, "Vytenis Povilas Andriukaitis");
+        System.out.println(a);
+
+    }
+}

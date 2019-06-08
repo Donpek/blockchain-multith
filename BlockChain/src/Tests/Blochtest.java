@@ -4,8 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import lt.viko.eif.blockChain.BlochChain;
-import lt.viko.eif.blockChain.Block;
+import lt.viko.eif.blockChain.BlockChain.BlochChain;
+import lt.viko.eif.blockChain.BlockChain.Block;
 
 public class Blochtest {
 

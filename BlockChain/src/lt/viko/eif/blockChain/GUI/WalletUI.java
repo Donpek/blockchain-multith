@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import lt.viko.eif.blockChain.BlochChain;
+import lt.viko.eif.blockChain.BlockChain.BlochChain;
 import lt.viko.eif.blockChain.KeyOperations.ExtensionChecker;
 import lt.viko.eif.blockChain.KeyOperations.JsonToKeyFileGenerator;
 import lt.viko.eif.blockChain.KeyOperations.MessageSigner;

@@ -1,4 +1,4 @@
-package lt.viko.eif.blockChain;
+package lt.viko.eif.blockChain.BlockChain;
 
 import java.util.ArrayList;
 import java.util.List;
