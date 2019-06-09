@@ -9,7 +9,7 @@ public class BlochChain {
 	
 	public BlochChain() {
 		blocks = new ArrayList<>();
-		
+			
 		Block genesis = new Block(0, System.currentTimeMillis(), null, "First block");
 		blocks.add(genesis);
 		

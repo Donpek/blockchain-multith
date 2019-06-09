@@ -4,7 +4,7 @@ import lt.viko.eif.blockChain.BlockChain.BlochChain;
 
 public class Counter {
 
-    public int getVotes(BlochChain blockChain, String candidate){
+    public static int getVotes(BlochChain blockChain, String candidate){
         String chain = blockChain.toString();
 
         int index = chain.indexOf(candidate);
