@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 public class Counter {
 
-   private int IngridaŠimonytė;
-   private int GitanasNausėda;
+   private int IngridaSimonyte;
+   private int GitanasNauseda;
    private int SauliusSkvernelis;
    private int VytenisPovilasAndriukaitis;
    private int ArvydasJuozaitis;
@@ -99,20 +99,20 @@ public class Counter {
         ValentinasPercent = valentinasPercent;
     }
 
-    public int getIngridaŠimonytė() {
-        return IngridaŠimonytė;
+    public int getIngridaSimonyte() {
+        return IngridaSimonyte;
     }
 
-    public void setIngridaŠimonytė(int ingridaŠimonytė) {
-        IngridaŠimonytė = ingridaŠimonytė;
+    public void setIngridaSimonyte(int IngridaSimonyte) {
+        IngridaSimonyte = IngridaSimonyte;
     }
 
-    public int getGitanasNausėda() {
-        return GitanasNausėda;
+    public int getGitanasNauseda() {
+        return GitanasNauseda;
     }
 
-    public void setGitanasNausėda(int gitanasNausėda) {
-        GitanasNausėda = gitanasNausėda;
+    public void setGitanasNauseda(int GitanasNauseda) {
+        GitanasNauseda = GitanasNauseda;
     }
 
     public int getSauliusSkvernelis() {
@@ -171,7 +171,7 @@ public class Counter {
         ValentinasMazuronis = valentinasMazuronis;
     }
 
-    public int getVotes(BlochChain blockChain, String candidate){
+    public static int getVotes(BlochChain blockChain, String candidate){
         String chain = blockChain.toString();
 
         int index = chain.indexOf(candidate);
@@ -220,9 +220,9 @@ public class Counter {
         String VM = "Valentinas Mazuronis";
 
 
-        setIngridaŠimonytė(getVotes(blockChain, IS));
+        setIngridaSimonyte(getVotes(blockChain, IS));
         setArvydasJuozaitis(getVotes(blockChain, AJ));
-        setGitanasNausėda(getVotes(blockChain, GN));
+        setGitanasNauseda(getVotes(blockChain, GN));
         setMindaugasPuidokas(getVotes(blockChain, MP));
         setNaglisPuteikis(getVotes(blockChain, NP));
         setSauliusSkvernelis(getVotes(blockChain, SS));
@@ -266,8 +266,8 @@ public class Counter {
 
     public String votesToString() {
         return "Votes{" + "\n" +
-                "Ingrida Šimonytė=" + IngridaŠimonytė + "votes \n" +
-                ", Gitanas Nausėda=" + GitanasNausėda + "votes \n" +
+                "Ingrida Šimonytė=" + IngridaSimonyte + "votes \n" +
+                ", Gitanas Nausėda=" + GitanasNauseda + "votes \n" +
                 ", Saulius Skvernelis=" + SauliusSkvernelis + "votes \n" +
                 ", Vytenis Povilas Andriukaitis=" + VytenisPovilasAndriukaitis + "votes \n" +
                 ", Arvydas Juozaitis=" + ArvydasJuozaitis + "votes \n" +
