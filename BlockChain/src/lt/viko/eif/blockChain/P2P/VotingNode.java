@@ -3,9 +3,12 @@ package lt.viko.eif.blockChain.P2P;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 import com.google.gson.*;
 
@@ -20,24 +23,25 @@ public class VotingNode extends Node {
 public static final String INSERTPEER = "JOIN";
 public static final String LISTPEER = "LIST";
 public static final String PEERNAME = "NAME";
-public static final String QUERY = "QUER";
-// public static final String GETRESULTS = "RSLT";
-public static final String QRESPONSE = "RESP";
-// public static final String GRESPONSE = "RESP";
-public static final String FILEGET = "FGET";
-// public static final String CASTVOTE = "VOTE";
 public static final String PEERQUIT = "QUIT";
+
 public static final String GIVE_ME_UR_BRUCKCHEIN = "GMUB";
+public static final String NEW_BLOCK = "NBLK";
+public static final String ADD_BLOCK = "ABLK";
+public static final String IM_WAITING_FOR_YOU_TO_ADD = "WYTA";
 
 public static final String REPLY = "REPL";
 public static final String ERROR = "ERRO";
 
 private static final ArrayList<String> candidates = new ArrayList<String>();
 private static BlochChain blockchain;
+private static Block myNewBlock;
+private static final HashMap<String,Integer> peers = new HashMap<>();
 public static boolean needToDownloadChain;
 
 public VotingNode(int maxPeers, PeerInfo myInfo) {
 	super(maxPeers, myInfo);
+	myNewBlock = null;
 	
 	candidates.add("Simonyte");
 	candidates.add("Nauseda");
@@ -48,14 +52,14 @@ public VotingNode(int maxPeers, PeerInfo myInfo) {
 	this.addRouter(new Router(this));
 	
 	this.addHandler(INSERTPEER, new JoinHandler(this));
-	this.addHandler(GIVE_ME_UR_BRUCKCHEIN, new GetBlockchainHandler(this));
 	this.addHandler(LISTPEER, new ListHandler(this));
 	this.addHandler(PEERNAME, new NameHandler(this));
-	this.addHandler(QUERY, new QueryHandler(this));
-	this.addHandler(QRESPONSE, new QResponseHandler(this));
-	this.addHandler(FILEGET, new FileGetHandler(this));
 	this.addHandler(PEERQUIT, new QuitHandler(this));
-	
+	this.addHandler(GIVE_ME_UR_BRUCKCHEIN, new GetBlockchainHandler(this));
+	this.addHandler(IM_WAITING_FOR_YOU_TO_ADD, new WaitForAddHandler(this));
+	this.addHandler(NEW_BLOCK, new NewBlockHandler(this));
+	this.addHandler(ADD_BLOCK, new AddBlockHandler(this));
+
 	if(myInfo.getPort() == VotingApp.GENESIS_PORT) {
 		blockchain = new BlochChain();
 	}else {
@@ -116,9 +120,53 @@ public int getVoteCount(String candidate) {
 }
 
 public void vote(String candidate) {
-	Block newVote = blockchain.newBlock(candidate);
+	Gson gson = new Gson();
+	myNewBlock = blockchain.newBlock(candidate);
+	String voteJSON = gson.toJson(myNewBlock);
 	
+	Set<String> keys = this.getPeerKeys();
+	HashMap<String[], PeerMessage> replies = new HashMap<>();
 	
+	for(String key : keys) {
+		String[] data = key.split(":");
+		String host = data[0];
+		int port = Integer.parseInt(data[1]);
+		List<PeerMessage> resplist = this.connectAndSend(new PeerInfo(host, port), 
+				NEW_BLOCK, voteJSON, true);	
+		replies.put(data, resplist.get(0));
+	}
+	
+	HashMap<Integer, String[]> rollers = new HashMap<>();
+	for(Map.Entry<String[], PeerMessage> entry : replies.entrySet()) {
+		PeerMessage reply = entry.getValue();
+		String[] peerData = entry.getKey();
+		
+		String[] replyData = reply.getMsgData().split("\\s");
+		String replyType = replyData[0];
+		if(replyType == "nope") {
+		}else if(replyType == "ts") {
+			long timestamp = Long.parseLong(replyData[1]);
+			if(timestamp < myNewBlock.getTimestamp()) {
+				List<PeerMessage> resplist = 
+						this.connectAndSend(new PeerInfo(peerData[0], 
+								Integer.parseInt(peerData[1])), 
+						IM_WAITING_FOR_YOU_TO_ADD, voteJSON, true);
+			}
+		}else if(replyType == "r#") {
+			// TODO Don #4 is reikalavimu
+			/*int roll = Int.parseInt(replyData[1]);
+			rollers.put(roll, )*/
+		}
+	}
+	
+	for(String key : keys) {
+		String[] data = key.split(":");
+		String host = data[0];
+		int port = Integer.parseInt(data[1]);
+		this.connectAndSend(new PeerInfo(host, port), ADD_BLOCK, voteJSON, false);		
+	}
+	blockchain.addBlock(myNewBlock);
+	myNewBlock = null;
 }
 
 public void buildPeers(String host, int port, int hops) {
@@ -157,6 +205,84 @@ public void buildPeers(String host, int port, int hops) {
 	}
 }
 
+/* NEW_BLOCK syntax: NBLK new-block-in-json-format
+ * REPLY syntax: RPLY param
+ * param options:
+ * 'nope' - signals that the verification failed
+ * 'ts' timestamp - the timestamp value of their own new block if they have one (if not, it's '0')
+ * 'r#' roll - the result of a 1d100 roll used for resolving 'stamped a new block at the same time' issues
+ * */
+private class NewBlockHandler implements HandlerInterface {
+	private Node peer;
+	
+	public NewBlockHandler(Node peer) { this.peer = peer; }
+	
+	public void handleMessage(PeerConnection peerconn, PeerMessage msg) {
+		System.out.println("KRWA");
+		Gson gson = new Gson();
+
+		String blockJSON = msg.getMsgData();
+		Block receivedBlock = gson.fromJson(blockJSON, Block.class);
+		
+		if(!blockchain.isValidNewBlock(receivedBlock, blockchain.latestBlock())) {
+			peerconn.sendData(new PeerMessage(REPLY, "nope"));
+			System.out.println("Block " + blockJSON + " is funky");
+			return; // block is funky, me no likey
+		}
+		
+		if(myNewBlock != null) {
+			if(myNewBlock.getTimestamp() == receivedBlock.getTimestamp())
+			{
+				int roll = ThreadLocalRandom.current().nextInt(1, 101);
+				peerconn.sendData(new PeerMessage(REPLY, "r# " + Integer.toString(roll)));
+				System.out.println("Block " + blockJSON + " is r#");
+
+			}else {
+				peerconn.sendData(new PeerMessage(REPLY, "ok " + Long.toString(
+						myNewBlock.getTimestamp())));
+				System.out.println("Block " + blockJSON + " is ok ts");
+
+			}
+		}else {
+			peerconn.sendData(new PeerMessage(REPLY, "ok 0"));
+			System.out.println("Block " + blockJSON + " is ok 0");
+
+		}
+	}
+}
+
+/* msg syntax: WYTA */
+private class WaitForAddHandler implements HandlerInterface {
+	private Node peer;
+	
+	public WaitForAddHandler(Node peer) { this.peer = peer; }
+	
+	public void handleMessage(PeerConnection peerconn, PeerMessage msg) {
+		while(myNewBlock != null) {} 
+		/* A short poem, while you wait:
+		 * Why is there blood,
+		 * I'm in the mud,
+		 * CPU melt, I know,
+		 * No one's paying me, though.
+		 * By Donatas Pekelis */
+		peerconn.sendData(new PeerMessage(REPLY, ""));
+	}
+}
+
+/* msg syntax: ABLK block-in-json-format */
+private class AddBlockHandler implements HandlerInterface {
+	private Node peer;
+	
+	public AddBlockHandler(Node peer) { this.peer = peer; }
+	
+	public void handleMessage(PeerConnection peerconn, PeerMessage msg) {
+		Gson gson = new Gson();
+		Block receivedBlock = gson.fromJson(msg.getMsgData(), Block.class);
+		blockchain.addBlock(receivedBlock);
+	}
+}
+
+/* msg syntax: GMUB */
 private class GetBlockchainHandler implements HandlerInterface {
 	private Node peer;
 	
