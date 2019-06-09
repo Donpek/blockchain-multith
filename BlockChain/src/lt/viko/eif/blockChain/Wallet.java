@@ -195,9 +195,23 @@ public class Wallet {
         blockchain.addBlock(blockchain.newBlock("Ingrida Šimonytė"));
         blockchain.addBlock(blockchain.newBlock("Vytenis Povilas Andriukaitis"));
         blockchain.addBlock(blockchain.newBlock("Vytenis Povilas Andriukaitis"));
-        System.out.println(blockchain);
-        int a = counter.getVotes(blockchain, "Vytenis Povilas Andriukaitis");
-        System.out.println(a);
+        blockchain.addBlock(blockchain.newBlock("Vytenis Povilas Andriukaitis"));
+        blockchain.addBlock(blockchain.newBlock("Vytenis Povilas Andriukaitis"));
+        blockchain.addBlock(blockchain.newBlock("Vytenis Povilas Andriukaitis"));
+        blockchain.addBlock(blockchain.newBlock("Vytenis Povilas Andriukaitis"));
+        blockchain.addBlock(blockchain.newBlock("Vytenis Povilas Andriukaitis"));
+        blockchain.addBlock(blockchain.newBlock("Vytenis Povilas Andriukaitis"));
+        //System.out.println(blockchain);
+        //int a = counter.getVotes(blockchain, "Vytenis Povilas Andriukaitis");
+        System.out.println(counter.getTotalVotes(blockchain));
+
+        counter.setVotes(blockchain);
+
+        System.out.println(counter.votesToString());
+
+        counter.setPercent(blockchain);
+
+        System.out.println(counter.percenttoString());
 
     }
 }
