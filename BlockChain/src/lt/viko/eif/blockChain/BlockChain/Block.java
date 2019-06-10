@@ -33,9 +33,16 @@ public class Block {
 	public String getHash() {
 		return hash;
 	}
+	public void setHash(String hash) {
+		this.hash = hash ;
+	}
+	
 
 	public String getPreviousHash() {
 		return previousHash;
+	}
+	public void setPreviousHash(String hash) {
+		this.previousHash = hash ;
 	}
 
 	public String getData() {

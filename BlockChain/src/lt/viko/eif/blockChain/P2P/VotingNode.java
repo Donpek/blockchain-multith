@@ -221,6 +221,8 @@ public void vote(String candidate) {
 		int port = Integer.parseInt(data[1]);
 		this.connectAndSend(new PeerInfo(host, port), ADD_BLOCK, voteJSON, false);	
 	}
+	myNewBlock.setPreviousHash(blockchain.latestBlock().getHash());
+	myNewBlock.setHash(myNewBlock.calculateHash(myNewBlock));
 	blockchain.addBlock(myNewBlock);
 	myNewBlock = null;
 }
@@ -346,6 +348,8 @@ private class AddBlockHandler implements HandlerInterface {
 	public void handleMessage(PeerConnection peerconn, PeerMessage msg) {
 		Gson gson = new Gson();
 		Block receivedBlock = gson.fromJson(msg.getMsgData(), Block.class);
+		receivedBlock.setPreviousHash(blockchain.latestBlock().getHash());
+		receivedBlock.setHash(receivedBlock.calculateHash(receivedBlock));
 		blockchain.addBlock(receivedBlock);
 	}
 }
