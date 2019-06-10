@@ -197,6 +197,9 @@ class RebuildListener implements ActionListener {
 				String host = data[0];
 				int port = Integer.parseInt(data[1]);
 				peer.buildPeers(host, port, 3);
+				peer.updateBlockchain();
+				updateVotingResults();
+				updatePeerList();
 			}
 			catch (Exception ex) {
 				LoggerUtil.getLogger().warning("VotingApp: rebuild: " + ex);

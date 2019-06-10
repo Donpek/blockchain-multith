@@ -29,6 +29,7 @@ public static final String GIVE_ME_UR_BRUCKCHEIN = "GMUB";
 public static final String NEW_BLOCK = "NBLK";
 public static final String ADD_BLOCK = "ABLK";
 public static final String IM_WAITING_FOR_YOU_TO_ADD = "WYTA";
+public static final String REROLL = "RERL";
 
 public static final String REPLY = "REPL";
 public static final String ERROR = "ERRO";
@@ -36,12 +37,14 @@ public static final String ERROR = "ERRO";
 private static final ArrayList<String> candidates = new ArrayList<String>();
 private static BlochChain blockchain;
 private static Block myNewBlock;
+private static int myRoll;
 private static final HashMap<String,Integer> peers = new HashMap<>();
 public static boolean needToDownloadChain;
 
 public VotingNode(int maxPeers, PeerInfo myInfo) {
 	super(maxPeers, myInfo);
 	myNewBlock = null;
+	myRoll = 0;
 	
 	candidates.add("Simonyte");
 	candidates.add("Nauseda");
@@ -59,6 +62,7 @@ public VotingNode(int maxPeers, PeerInfo myInfo) {
 	this.addHandler(IM_WAITING_FOR_YOU_TO_ADD, new WaitForAddHandler(this));
 	this.addHandler(NEW_BLOCK, new NewBlockHandler(this));
 	this.addHandler(ADD_BLOCK, new AddBlockHandler(this));
+	this.addHandler(REROLL, new RerollBlockHandler(this));
 
 	if(myInfo.getPort() == VotingApp.GENESIS_PORT) {
 		blockchain = new BlochChain();
@@ -119,6 +123,45 @@ public int getVoteCount(String candidate) {
 	return Counter.getVotes(blockchain, candidate);
 }
 
+public void recursiveReroll(HashMap<Integer, ArrayList<String[]>> rollers, ArrayList<String[]> addOrder){
+	int biggestIndex;
+	Integer[] rolls = rollers.keySet().toArray(new Integer[rollers.size()]);
+	for(int i=0;i<rolls.length-1;++i) {
+		biggestIndex = i;
+		for(int j=i;j<rolls.length-1;++j)
+		{
+			if(rolls[j] > rolls[biggestIndex]) {
+				biggestIndex = j;
+			}
+		}
+		Integer temp = rolls[i];
+		rolls[i] = rolls[biggestIndex];
+		rolls[biggestIndex] = temp;
+	}
+	
+	HashMap<Integer, ArrayList<String[]>> rerolls = new HashMap<>();
+	for(int i=0;i<rollers.size();++i) {
+		ArrayList<String[]> peersThatRolledThat = rollers.get(rolls[i]);
+		
+		if(peersThatRolledThat.size() == 1) {
+			addOrder.add(peersThatRolledThat.get(0));
+		}else {
+			myRoll = ThreadLocalRandom.current().nextInt(1, 101);
+			for(String[] peerData : peersThatRolledThat) {
+				List<PeerMessage> reroll = this.connectAndSend(new PeerInfo(peerData[0], 
+						Integer.parseInt(peerData[1])), REROLL, "", true);
+				int roll = Integer.parseInt(reroll.get(0).getMsgData());
+				if(rerolls.containsKey(roll)) {
+					rerolls.get(roll).add(peerData);
+				}else{
+					rerolls.put(roll, new ArrayList<String[]>());
+				}
+				this.recursiveReroll(rerolls, addOrder);
+			}
+		}
+	}
+}
+
 public void vote(String candidate) {
 	Gson gson = new Gson();
 	myNewBlock = blockchain.newBlock(candidate);
@@ -136,7 +179,7 @@ public void vote(String candidate) {
 		replies.put(data, resplist.get(0));
 	}
 	
-	HashMap<Integer, String[]> rollers = new HashMap<>();
+	HashMap<Integer, ArrayList<String[]>> rollers = new HashMap<>();
 	for(Map.Entry<String[], PeerMessage> entry : replies.entrySet()) {
 		PeerMessage reply = entry.getValue();
 		String[] peerData = entry.getKey();
@@ -153,17 +196,24 @@ public void vote(String candidate) {
 						IM_WAITING_FOR_YOU_TO_ADD, voteJSON, true);
 			}
 		}else if(replyType == "r#") {
-			// TODO Don #4 is reikalavimu
-			/*int roll = Int.parseInt(replyData[1]);
-			rollers.put(roll, )*/
+			// NOTE Don #4 is reikalavimu
+			int roll = Integer.parseInt(replyData[1]);
+			if(rollers.containsKey(roll)) {
+				rollers.get(roll).add(peerData);
+			}else{
+				rollers.put(roll, new ArrayList<String[]>());
+			}
 		}
 	}
+	
+	ArrayList<String[]> addOrder = new ArrayList<String[]>();
+	this.recursiveReroll(rollers, addOrder);
 	
 	for(String key : keys) {
 		String[] data = key.split(":");
 		String host = data[0];
 		int port = Integer.parseInt(data[1]);
-		this.connectAndSend(new PeerInfo(host, port), ADD_BLOCK, voteJSON, false);		
+		this.connectAndSend(new PeerInfo(host, port), ADD_BLOCK, voteJSON, false);	
 	}
 	blockchain.addBlock(myNewBlock);
 	myNewBlock = null;
@@ -205,6 +255,18 @@ public void buildPeers(String host, int port, int hops) {
 	}
 }
 
+/* msg syntax: RERL */
+private class RerollBlockHandler implements HandlerInterface {
+	private Node peer;
+	
+	public RerollBlockHandler(Node peer) { this.peer = peer; }
+	
+	public void handleMessage(PeerConnection peerconn, PeerMessage msg) {
+		myRoll = ThreadLocalRandom.current().nextInt(1, 101);
+		peerconn.sendData(new PeerMessage(REPLY, Integer.toString(myRoll)));
+	}
+}
+
 /* NEW_BLOCK syntax: NBLK new-block-in-json-format
  * REPLY syntax: RPLY param
  * param options:
@@ -233,8 +295,8 @@ private class NewBlockHandler implements HandlerInterface {
 		if(myNewBlock != null) {
 			if(myNewBlock.getTimestamp() == receivedBlock.getTimestamp())
 			{
-				int roll = ThreadLocalRandom.current().nextInt(1, 101);
-				peerconn.sendData(new PeerMessage(REPLY, "r# " + Integer.toString(roll)));
+				myRoll = ThreadLocalRandom.current().nextInt(1, 101);
+				peerconn.sendData(new PeerMessage(REPLY, "r# " + Integer.toString(myRoll)));
 				System.out.println("Block " + blockJSON + " is r#");
 
 			}else {
