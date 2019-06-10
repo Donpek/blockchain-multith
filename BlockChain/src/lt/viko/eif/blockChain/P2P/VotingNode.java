@@ -43,11 +43,17 @@ public VotingNode(int maxPeers, PeerInfo myInfo) {
 	super(maxPeers, myInfo);
 	myNewBlock = null;
 	
-	candidates.add("Simonyte");
-	candidates.add("Nauseda");
-	candidates.add("Puidokas");
-	candidates.add("Brazauskas");
-	candidates.add("Pekelis");
+	candidates.add("Ingrida Šimonytė");
+	candidates.add("Gitanas Nausėda");
+	candidates.add("Saulius Skvernelis");
+	candidates.add("Vytenis Povilas Andriukaitis");
+	candidates.add("Arvydas Juozaitis");
+	candidates.add("Valdemaras Tomaševskis");
+	candidates.add("Mindaugas Puidokas");
+	candidates.add("Naglis Puteikis");
+	candidates.add("Valentinas Mazuronis");
+
+
 
 	this.addRouter(new Router(this));
 	
