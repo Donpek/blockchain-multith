@@ -16,7 +16,7 @@ public class VotingApp extends JFrame
 {
 
 public static final int GENESIS_PORT = 4269;
-private static final int FRAME_WIDTH = 565, FRAME_HEIGHT = 565;
+private static final int FRAME_WIDTH = 530, FRAME_HEIGHT = 400;
 
 private JPanel votingPanel, peersPanel;
 private JPanel lowervotingPanel, lowerPeersPanel;
@@ -25,7 +25,7 @@ private JList votingResultsList, peersList;
 
 
 private JButton fetchVotingResultsButton, voteButton, voteButtonComboBox;
-private JButton removePeersButton, refreshPeersButton, rebuildPeersButton, addKey;
+private JButton refreshPeersButton, rebuildPeersButton, addKey;
 
 private JComboBox candidates;
 private JTextField addTextField, addKeyField;
@@ -60,17 +60,21 @@ private VotingApp(String initialhost, int initialport, int maxpeers, PeerInfo my
 	voteButtonComboBox.addActionListener(new AddListenerComboBox());
 	refreshPeersButton = new JButton("Refresh");
 	refreshPeersButton.addActionListener(new RefreshListener());
-	rebuildPeersButton = new JButton("Rebuild");
+	rebuildPeersButton = new JButton("Connect");
 	rebuildPeersButton.addActionListener(new RebuildListener());
 	addKey = new JButton("Key");
 
 
 
 	candidates = new JComboBox(candidate);
-	addTextField = new JTextField(15);
+	addTextField = new JTextField(16);
 	addKeyField = new JTextField(15);
 	rebuildTextField = new JTextField(15);
 	personalNoField = new JTextField(21);
+	personalNoField.setText("Personal No.");
+	addKeyField.setText("Key ");
+	addTextField.setText("Candidate name surrname");
+	rebuildTextField.setText("Host:Port");
 	personalNoField.setHorizontalAlignment(JTextField.LEFT);
 
 
@@ -87,20 +91,6 @@ private VotingApp(String initialhost, int initialport, int maxpeers, PeerInfo my
 	setupFrame(this);
 
 	(new Thread() { public void run() { peer.mainLoop(); }}).start();
-
-	/*
-	  Swing is not threadsafe, so can't update GUI component
-	  from a thread other than the event thread
-	 */
-	/*
-	(new Thread() { public void run() { 
-		while (true) {
-
-			new RefreshListener().actionPerformed(null);
-			try { Thread.sleep(1000); } catch (InterruptedException e) { }
-		}
-	}}).start();
-	 */
 	new javax.swing.Timer(3000, new RefreshListener()).start();
 
 	peer.startStabilizer(new SimplePingStabilizer(peer), 3000);
@@ -120,12 +110,8 @@ private void setupFrame(JFrame frame)
 
 
 	JPanel upperPanel = new JPanel();
-	JPanel lowerPanel = new JPanel();
-	upperPanel.setLayout(new GridLayout(1, 2));
-	// allots the upper panel 2/3 of the frame height
-	upperPanel.setPreferredSize(new Dimension(FRAME_WIDTH, (FRAME_HEIGHT * 2 / 3)));
-	lowerPanel.setLayout(new GridLayout(1, 2));
-
+	upperPanel.setLayout(new GridLayout(2, 2));
+	upperPanel.setPreferredSize(new Dimension(500, 350));
 
 	frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
 
@@ -135,6 +121,7 @@ private void setupFrame(JFrame frame)
 	peersList = new JList(peersModel);
 	votingPanel = initPanel(new JLabel("Current Results"), votingResultsList);
 	peersPanel = initPanel(new JLabel("Peer List"), peersList);
+
 	lowervotingPanel = new JPanel();
 	lowerPeersPanel = new JPanel();
 
@@ -148,7 +135,6 @@ private void setupFrame(JFrame frame)
 
 	lowervotingPanel.add(optionComboBox);
 	lowervotingPanel.add(optionTextBox);
-
 	lowervotingPanel.add(voteButton);
 	voteButton.setEnabled(false);
 	lowervotingPanel.add(addTextField);
@@ -164,17 +150,17 @@ private void setupFrame(JFrame frame)
 
 
 
+
 	upperPanel.add(votingPanel);
 	upperPanel.add(peersPanel);
-	lowerPanel.add(lowervotingPanel);
-	lowerPanel.add(lowerPeersPanel);
+	upperPanel.add(lowervotingPanel);
+	upperPanel.add(lowerPeersPanel);
 
 	/* by using a CENTER BorderLayout, the 
 	   overlapping problem is fixed:
 	   http://forum.java.sun.com/thread.jspa?threadID=551544&messageID=2698227 */
 
 	frame.add(upperPanel, BorderLayout.NORTH);
-	frame.add(lowerPanel, BorderLayout.CENTER);
 
 	frame.setVisible(true);
 
