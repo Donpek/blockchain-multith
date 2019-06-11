@@ -292,7 +292,7 @@ public static void main(String[] args) throws IOException
 	}
 
 //	LoggerUtil.setHandlersLevel(Level.FINE);
-	new VotingApp("localhost", GENESIS_PORT, 5, new PeerInfo("localhost", port));
+	new VotingApp("localhost", GENESIS_PORT, 100, new PeerInfo("localhost", port));
 }
 
 }
