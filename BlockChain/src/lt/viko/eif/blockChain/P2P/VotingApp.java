@@ -131,7 +131,7 @@ public class VotingApp extends JFrame {
 
 		JPanel upperPanel = new JPanel();
 		upperPanel.setLayout(new GridLayout(2, 2));
-		upperPanel.setPreferredSize(new Dimension(500, 350));
+		upperPanel.setPreferredSize(new Dimension(500, 500));
 
 		frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
 
@@ -320,6 +320,12 @@ public class VotingApp extends JFrame {
 							if (success) {
 
 								//>>>>>>>>>Integrate blockChain here<<<<<<<<//
+								System.out.println("You: " + personalNo);
+								System.out.println("Vote for: " + chosenCandidate);
+								System.out.println("Your private key is: " + votersPrivateKey);
+								System.out.println("Your public key is: " + votersPublicKey);
+
+
 								if (!chosenCandidate.equals("")) {
 									peer.vote(chosenCandidate);
 									afterText = "VOTE CAST";
@@ -427,6 +433,12 @@ public class VotingApp extends JFrame {
 							if (success) {
 
 								//>>>>>>>>>Integrate blockChain here<<<<<<<<//
+
+								System.out.println("You: " + personalNo);
+								System.out.println("Vote for: " + chosenCandidate);
+								System.out.println("Your private key is: " + votersPrivateKey);
+								System.out.println("Your public key is: " + votersPublicKey);
+
 
 									peer.vote(chosenCandidate);
 									//afterText = "VOTE CAST";

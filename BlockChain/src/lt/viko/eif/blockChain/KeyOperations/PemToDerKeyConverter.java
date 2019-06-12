@@ -1,5 +1,6 @@
 package lt.viko.eif.blockChain.KeyOperations;
 
+import com.sun.javafx.PlatformUtil;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -20,17 +21,35 @@ public class PemToDerKeyConverter {
     String newKey = userHome + "/private.der";
     int exitC = 0;
     //Need to find Windows alternative for this
-    String[] cmd = {"cmd.exe", "/c",
-        "openssl pkcs8 -topk8 -inform PEM -outform DER -in " + privateKeyPath + " -nocrypt > "
-            + newKey};
-    ShellScripting(newKey, exitC, cmd);
-    byte[] keyBytes = Files.readAllBytes(Paths.get(newKey));
-    PKCS8EncodedKeySpec spec =
-        new PKCS8EncodedKeySpec(keyBytes);
-    KeyFactory kf = KeyFactory.getInstance("RSA");
-    File keyFile = new File(newKey);
-    keyFile.delete();
-    return kf.generatePrivate(spec);
+    if (PlatformUtil.isWindows()){
+      String[] cmd = {"cmd.exe", "/c",
+          "openssl pkcs8 -topk8 -inform PEM -outform DER -in " + privateKeyPath + " -nocrypt > "
+              + newKey};
+      ShellScripting(newKey, exitC, cmd);
+      byte[] keyBytes = Files.readAllBytes(Paths.get(newKey));
+      PKCS8EncodedKeySpec spec =
+          new PKCS8EncodedKeySpec(keyBytes);
+      KeyFactory kf = KeyFactory.getInstance("RSA");
+      File keyFile = new File(newKey);
+      keyFile.delete();
+      return kf.generatePrivate(spec);
+
+    } else {
+      String[] cmd = {"/bin/bash", "-c",
+          "openssl pkcs8 -topk8 -inform PEM -outform DER -in " + privateKeyPath + " -nocrypt > "
+              + newKey};
+      ShellScripting(newKey, exitC, cmd);
+      byte[] keyBytes = Files.readAllBytes(Paths.get(newKey));
+      PKCS8EncodedKeySpec spec =
+          new PKCS8EncodedKeySpec(keyBytes);
+      KeyFactory kf = KeyFactory.getInstance("RSA");
+      File keyFile = new File(newKey);
+      keyFile.delete();
+      return kf.generatePrivate(spec);
+
+    }
+
+
   }
 
   public static PublicKey getPublicKey(String publicKeyPath)
@@ -40,9 +59,41 @@ public class PemToDerKeyConverter {
     String newKey = userHome + "/temp_public.der";
     int exitC = 0;
     //Need to find Windows alternative for this
-    String[] cmd = {"cmd.exe", "/c",
-        "openssl rsa -pubin -inform PEM -in " + publicKeyPath + " -outform DER -out "
-            + newKey};
+    if (PlatformUtil.isWindows()) {
+      String[] cmd = {"cmd.exe", "/c",
+          "openssl rsa -pubin -inform PEM -in " + publicKeyPath + " -outform DER -out "
+              + newKey};
+
+      ShellScripting(newKey, exitC, cmd);
+      byte[] keyBytes = Files.readAllBytes(Paths.get(newKey));;
+      X509EncodedKeySpec spec =
+          new X509EncodedKeySpec(keyBytes);
+      KeyFactory kf = KeyFactory.getInstance("RSA");
+      File derKeyFile = new File(newKey);
+      derKeyFile.delete();
+      File pemKeyFile = new File(publicKeyPath);
+      pemKeyFile.delete();
+      return kf.generatePublic(spec);
+
+
+    } else {
+      String[] cmd = {"/bin/bash", "-c",
+          "openssl rsa -pubin -inform PEM -in " + publicKeyPath + " -outform DER -out "
+              + newKey};
+      ShellScripting(newKey, exitC, cmd);
+      byte[] keyBytes = Files.readAllBytes(Paths.get(newKey));;
+      X509EncodedKeySpec spec =
+          new X509EncodedKeySpec(keyBytes);
+      KeyFactory kf = KeyFactory.getInstance("RSA");
+      File derKeyFile = new File(newKey);
+      derKeyFile.delete();
+      File pemKeyFile = new File(publicKeyPath);
+      pemKeyFile.delete();
+      return kf.generatePublic(spec);
+
+
+    }
+/*
     ShellScripting(newKey, exitC, cmd);
     byte[] keyBytes = Files.readAllBytes(Paths.get(newKey));;
     X509EncodedKeySpec spec =
@@ -52,7 +103,7 @@ public class PemToDerKeyConverter {
     derKeyFile.delete();
     File pemKeyFile = new File(publicKeyPath);
     pemKeyFile.delete();
-    return kf.generatePublic(spec);
+    return kf.generatePublic(spec);*/
   }
 
   private static void ShellScripting(String newKey, int exitC, String[] cmd) throws IOException {
