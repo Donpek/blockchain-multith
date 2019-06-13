@@ -515,14 +515,16 @@ public class VotingApp extends JFrame {
 
 		public static void main(String[] args) throws IOException {
 			int port = 9000;
-			if (args.length != 1) {
+			String host = "";
+			if (args.length != 2) {
 				System.out.println("Usage: java ... lt.viko.eif.blockChain.P2P.VotingApp <host-port>");
 			} else {
-				port = Integer.parseInt(args[0]);
+				port = Integer.parseInt(args[1]);
+				host = args[0];
 			}
 
 //	LoggerUtil.setHandlersLevel(Level.FINE);
-			new VotingApp("localhost", GENESIS_PORT, 100, new PeerInfo("localhost", port));
+			new VotingApp("192.168.43.186", GENESIS_PORT, 100, new PeerInfo(host, port));
 		}
 
 	}
