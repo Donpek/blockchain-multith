@@ -23,7 +23,7 @@ import peerbase.util.SimplePingStabilizer;
 public class VotingApp extends JFrame {
 
 	public static final int GENESIS_PORT = 4269;
-	private static final int FRAME_WIDTH = 530, FRAME_HEIGHT = 400;
+	private static final int FRAME_WIDTH = 530, FRAME_HEIGHT = 500;
 
 	private JPanel votingPanel, peersPanel;
 	private JPanel lowervotingPanel, lowerPeersPanel;
@@ -94,7 +94,7 @@ public class VotingApp extends JFrame {
 		rebuildTextField.setText("Host:Port");
 		personalNoFormattedTextField.setHorizontalAlignment(JTextField.LEFT);
 
-		optionComboBox = new JRadioButton("Select candidate from list");
+		optionComboBox = new JRadioButton("Select candidate");
 		optionTextBox = new JRadioButton("Write it yourself");
 		ButtonGroup group = new ButtonGroup();
 		group.add(optionComboBox);
