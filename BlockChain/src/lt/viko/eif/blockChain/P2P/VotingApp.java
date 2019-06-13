@@ -442,6 +442,15 @@ public class VotingApp extends JFrame {
 
 									peer.vote(chosenCandidate);
 									//afterText = "VOTE CAST";
+								VoterController.AlreadyVotedSoRemoveRight(personalNo);
+								JOptionPane.showMessageDialog(null,
+										"Vote counted.",
+										"Vote Successful",
+										JOptionPane.INFORMATION_MESSAGE);
+								optionComboBox.setEnabled(false);
+								optionTextBox.setEnabled(false);
+								//disableVoting();
+								//disableCandidateSelection();
 
 								addTextField.requestFocusInWindow();
 								//ddTextField.setText(afterText);
