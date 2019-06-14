@@ -23,7 +23,7 @@ import peerbase.util.SimplePingStabilizer;
 public class VotingApp extends JFrame {
 
 	public static final int GENESIS_PORT = 4269;
-	private static final int FRAME_WIDTH = 530, FRAME_HEIGHT = 400;
+	private static final int FRAME_WIDTH = 530, FRAME_HEIGHT = 500;
 
 	private JPanel votingPanel, peersPanel;
 	private JPanel lowervotingPanel, lowerPeersPanel;
@@ -94,7 +94,7 @@ public class VotingApp extends JFrame {
 		rebuildTextField.setText("Host:Port");
 		personalNoFormattedTextField.setHorizontalAlignment(JTextField.LEFT);
 
-		optionComboBox = new JRadioButton("Select candidate from list");
+		optionComboBox = new JRadioButton("Select candidate");
 		optionTextBox = new JRadioButton("Write it yourself");
 		ButtonGroup group = new ButtonGroup();
 		group.add(optionComboBox);
@@ -181,7 +181,7 @@ public class VotingApp extends JFrame {
 		upperPanel.add(lowervotingPanel);
 		upperPanel.add(lowerPeersPanel);
 
-	/* by using a CENTER BorderLayout, the 
+	/* by using a CENTER BorderLayout, the
 	   overlapping problem is fixed:
 	   http://forum.java.sun.com/thread.jspa?threadID=551544&messageID=2698227 */
 
@@ -516,13 +516,13 @@ public class VotingApp extends JFrame {
 		public static void main(String[] args) throws IOException {
 			int port = 9000;
 			String host = "";
-			if (args.length != 1) {
+			if (args.length != 2) {
 				System.out.println("Usage: java ... lt.viko.eif.blockChain.P2P.VotingApp <host-port>");
 			} else {
 				port = Integer.parseInt(args[1]);
 				host = args[0];
 			}
-			
+
 			String genesisIP = "192.168.8.103";
 
 //	LoggerUtil.setHandlersLevel(Level.FINE);
@@ -530,4 +530,3 @@ public class VotingApp extends JFrame {
 		}
 
 	}
-
